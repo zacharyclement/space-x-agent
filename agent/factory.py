@@ -2,13 +2,8 @@
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import Mapping, Sequence
 from typing import Protocol
-
-from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.memory import InMemorySaver
 
 from agent.middleware import build_trim_messages_middleware, handle_spacex_tool_errors
 from agent.state import ChatAgentState
@@ -26,15 +21,15 @@ You are a SpaceX assistant.
 """.strip()
 
 
-class SupportsInvoke(Protocol):
-    """Protocol for LangChain agent invoke behavior."""
+class SupportsAsyncInvoke(Protocol):
+    """Protocol for LangChain agent async invocation behavior."""
 
-    def invoke(
+    async def ainvoke(
         self,
         input_payload: Mapping[str, object],
         config: Mapping[str, object] | None = None,
     ) -> Mapping[str, object]:
-        """Invoke agent with payload and optional config."""
+        """Invoke agent asynchronously with payload and optional config."""
 
 
 class AgentRunnerInterface(Protocol):
@@ -47,7 +42,7 @@ class AgentRunnerInterface(Protocol):
 class LangChainAgentRunner(AgentRunnerInterface):
     """Adapter that executes a LangChain agent and extracts text output."""
 
-    def __init__(self, agent: SupportsInvoke) -> None:
+    def __init__(self, agent: SupportsAsyncInvoke) -> None:
         """Initialize with an agent instance."""
         self._agent = agent
 
@@ -66,7 +61,7 @@ class LangChainAgentRunner(AgentRunnerInterface):
         """
         payload = {"messages": [{"role": "user", "content": user_message}]}
         config = {"configurable": {"thread_id": thread_id}}
-        result = await asyncio.to_thread(self._agent.invoke, payload, config)
+        result = await self._agent.ainvoke(payload, config)
         response_text = self._extract_last_ai_message(result)
         if not response_text:
             raise SpaceXAgentError("Agent returned no assistant response.")
@@ -101,6 +96,10 @@ def build_agent_runner(
     Returns:
         Ready-to-use agent runner.
     """
+    from langchain.agents import create_agent
+    from langchain_openai import ChatOpenAI
+    from langgraph.checkpoint.memory import InMemorySaver
+
     tools = create_spacex_tools(spacex_client)
     model = ChatOpenAI(
         model=settings.openai_model,

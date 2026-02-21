@@ -66,19 +66,20 @@ class FakeSpaceXClient(SpaceXClientInterface):
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
         populate_rocket: bool = True,
         populate_launchpad: bool = False,
         sort_direction: Literal["asc", "desc"] = "desc",
+        select_fields: str | None = None,
     ) -> QueryResponse:
-        del query, limit, populate_rocket, populate_launchpad, sort_direction
+        del query, limit, populate_rocket, populate_launchpad, sort_direction, select_fields
         return {"docs": [], "totalDocs": 0}
 
     async def query_rockets_raw(
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
     ) -> QueryResponse:
         del query, limit
         return {"docs": [], "totalDocs": 0}

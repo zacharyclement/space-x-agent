@@ -148,13 +148,16 @@ class HttpSpaceXClient(SpaceXClientInterface):
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
         populate_rocket: bool = True,
         populate_launchpad: bool = False,
         sort_direction: Literal["asc", "desc"] = "desc",
+        select_fields: str | None = None,
     ) -> QueryResponse:
         """Return raw `/launches/query` response payload."""
         options: dict[str, object] = {"limit": limit, "sort": {"date_utc": sort_direction}}
+        if select_fields:
+            options["select"] = select_fields
         if populate_rocket:
             options["populate"] = [{"path": "rocket", "select": "name type"}]
         if populate_launchpad:
@@ -179,20 +182,27 @@ class HttpSpaceXClient(SpaceXClientInterface):
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
     ) -> QueryResponse:
-        """Return raw `/rockets/query` response payload."""
-        payload = {
-            "query": dict(query),
-            "options": {"limit": limit},
-        }
-        self._logger.debug("spacex_rocket_query_started", payload=self._summarize_payload(payload))
-        response = await self._request_json("POST", "/rockets/query", json_payload=payload)
+        """Return broad raw rocket payload from `/rockets`."""
+        del query, limit
+        self._logger.debug("spacex_rocket_query_started", endpoint="/rockets")
+        response = await self._request_json("GET", "/rockets")
+        if isinstance(response, list):
+            docs = [doc for doc in response if isinstance(doc, Mapping)]
+            mapping: QueryResponse = {"docs": docs, "totalDocs": len(docs)}
+            self._logger.debug(
+                "spacex_rocket_query_succeeded",
+                endpoint="/rockets",
+                returned_docs=len(docs),
+            )
+            return mapping
+
         mapping = self._as_mapping(response, message="Unexpected payload for rocket query.")
         docs = self._extract_docs(mapping, message="Unexpected payload for rocket query.")
         self._logger.debug(
             "spacex_rocket_query_succeeded",
-            query_keys=sorted(query.keys()),
+            endpoint="/rockets",
             returned_docs=len(docs),
         )
         return mapping
@@ -216,6 +226,7 @@ class HttpSpaceXClient(SpaceXClientInterface):
             populate_rocket=populate_rocket,
             populate_launchpad=populate_launchpad,
             sort_direction=sort_direction,
+            select_fields=None,
         )
         return self._extract_docs(response, message="Unexpected payload for launch query.")
 

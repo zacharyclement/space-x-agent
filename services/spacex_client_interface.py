@@ -50,10 +50,11 @@ class SpaceXClientInterface(ABC):
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
         populate_rocket: bool = True,
         populate_launchpad: bool = False,
         sort_direction: Literal["asc", "desc"] = "desc",
+        select_fields: str | None = None,
     ) -> QueryResponse:
         """Return raw `/launches/query` response payload."""
 
@@ -62,9 +63,9 @@ class SpaceXClientInterface(ABC):
         self,
         *,
         query: Mapping[str, object],
-        limit: int = 10,
+        limit: int = 1000,
     ) -> QueryResponse:
-        """Return raw `/rockets/query` response payload."""
+        """Return broad raw rocket payload."""
 
     @abstractmethod
     async def close(self) -> None:

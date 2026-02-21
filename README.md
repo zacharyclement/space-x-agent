@@ -27,12 +27,19 @@ FastAPI + LangChain conversational agent that answers SpaceX questions using liv
 > Note: In this workspace runtime, creating hidden files via tooling may be restricted.
 > If needed, copy `env.example` to `.env` manually.
 
-## Run
+## Run and test in browser
 
-- API + UI:
-  - `uvicorn api.main:app --reload`
-- Open:
-  - `http://127.0.0.1:8000/`
+1. Start the API server:
+   - `uvicorn api.main:app --reload`
+2. Open the chat UI in your browser (choose one):
+   - Served by FastAPI: `http://127.0.0.1:8000/`
+   - Open the HTML file directly: `open space-x-agent/web/index.html`
+3. Test from the browser chat box with prompts like:
+   - `When was the last SpaceX launch?`
+   - `What's the next SpaceX launch and where is it happening?`
+   - `How many launches did SpaceX complete in 2024?`
+
+> If you open `web/index.html` directly (`file://`), keep the API server running on `http://127.0.0.1:8000` so the page can call `/chat`.
 
 ## Memory implementation
 

@@ -66,6 +66,15 @@ Use it to discover additional pages (including production-grade checkpointer opt
 - `isort --check-only .`
 - `mypy .`
 
+## Validation
+
+Validation is currently a mix of unit tests, API tests, and manual prompt checks in the chat UI.
+
+- Not all tools are fully reliable yet against the live SpaceX API; some flows work consistently, while others still fail or return incomplete results.
+- Because tool reliability is mixed, treat agent answers as best-effort unless they are verified against tool output.
+- We have established golden data in a LangSmith dataset for regression-style evaluation.
+- That LangSmith dataset is used to iterate on tool behavior, prompts, and parsing logic, then measure whether agent performance improves over time.
+
 ## Production memory upgrade path
 
 For production persistence, replace `InMemorySaver` with a database-backed checkpointer (for example Postgres via `langgraph-checkpoint-postgres`) while keeping the same `thread_id` contract.

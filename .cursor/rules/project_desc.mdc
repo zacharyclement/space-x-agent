@@ -1,3 +1,52 @@
 ---
 alwaysApply: true
 ---
+AI Agent Engineering Exercise
+Design and implement a simple conversational AI agent that can answer questions about Space
+X using the SpaceX API. The focus is not on having a polished UI, but on demonstrating a solid
+understanding of agentic patterns, prompt design, tool usage, and thoughtful system design.
+
+High-Level Requirements
+1. Conversational Agent
+○ Build an agent that a user can chat with using natural language (e.g., via a simple
+console or web interface).
+○ The agent should maintain conversational context across multiple turns.
+2. Domain: SpaceX
+○ The agent should be able to discuss SpaceX and answer factual questions about
+the company based on the live data in the API
+○ Example queries:
+■ “When was the last SpaceX launch?”
+■ “What’s the next SpaceX launch and where is it happening?”
+■ “How many launches did SpaceX complete in 2024?”
+■ “Which rocket was used for the Starlink 9-1 mission?”
+■ “Show me all successful Falcon 9 launches.”
+■ “What was the outcome of the first Falcon Heavy launch?”
+■ “Tell me about the most recent launch from Vandenberg.”
+
+3. Tool Design
+○ The agent should use one or more tools (functions, APIs, or retrievers) to fetch
+information from SpaceX API.
+○ The tools should handle:
+■ API request construction
+■ Response parsing and data cleaning
+■ Error handling and fallbacks
+○ Example tool calls: (note, these are not tools you need to incorporate, just
+examples of tools you could build)
+■ compare_rockets(rockets: list[str])
+■ search_missions(query: str)
+
+4. LLM Integration
+○ The LLM should interpret user intent, decide when to call a tool, and how to use
+the result in its response.
+○ Responses should be clear and grounded in data from the tool output.
+○ Hardcoding answers or skipping tool usage will not meet the intent of the
+exercise.
+5. Agentic Behavior
+○ The agent should show some autonomous reasoning — for example:
+■ Making multiple tool calls to gather complete information.
+■ Asking clarifying questions when user input is ambiguous.
+■ Iterating on its own responses to ensure accuracy or completeness.
+
+6. Validation
+○ Provide a brief overview or implementation of how you verified the agent’s
+accuracy and reliability.

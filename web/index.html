@@ -63,7 +63,8 @@
     </form>
 
     <script>
-      const CHAT_ENDPOINT = "/chat";
+      const CHAT_ENDPOINT =
+        window.location.protocol === "file:" ? "http://127.0.0.1:8000/chat" : "/chat";
       const THREAD_KEY = "spacex_agent_thread_id";
       const messageContainer = document.getElementById("messages");
       const threadIdLabel = document.getElementById("thread-id");

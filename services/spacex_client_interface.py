@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
+from typing import Literal
 
 LaunchRecord = Mapping[str, object]
+QueryResponse = Mapping[str, object]
 
 
 class SpaceXClientInterface(ABC):
@@ -42,6 +44,27 @@ class SpaceXClientInterface(ABC):
         self, rocket_name: str, *, limit: int = 10
     ) -> Sequence[LaunchRecord]:
         """Fetch successful launches for a given rocket name."""
+
+    @abstractmethod
+    async def query_launches_raw(
+        self,
+        *,
+        query: Mapping[str, object],
+        limit: int = 10,
+        populate_rocket: bool = True,
+        populate_launchpad: bool = False,
+        sort_direction: Literal["asc", "desc"] = "desc",
+    ) -> QueryResponse:
+        """Return raw `/launches/query` response payload."""
+
+    @abstractmethod
+    async def query_rockets_raw(
+        self,
+        *,
+        query: Mapping[str, object],
+        limit: int = 10,
+    ) -> QueryResponse:
+        """Return raw `/rockets/query` response payload."""
 
     @abstractmethod
     async def close(self) -> None:

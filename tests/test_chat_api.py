@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 import os
+from typing import Literal
 
 from fastapi.testclient import TestClient
 
@@ -14,7 +15,11 @@ os.environ.setdefault("LANGCHAIN_API_KEY", "test-langsmith-key")
 
 from api.main import create_app
 from core.settings import Settings
-from services.spacex_client_interface import LaunchRecord, SpaceXClientInterface
+from services.spacex_client_interface import (
+    LaunchRecord,
+    QueryResponse,
+    SpaceXClientInterface,
+)
 
 
 class FakeRunner:
@@ -56,6 +61,27 @@ class FakeSpaceXClient(SpaceXClientInterface):
     ) -> Sequence[LaunchRecord]:
         del rocket_name, limit
         return []
+
+    async def query_launches_raw(
+        self,
+        *,
+        query: Mapping[str, object],
+        limit: int = 10,
+        populate_rocket: bool = True,
+        populate_launchpad: bool = False,
+        sort_direction: Literal["asc", "desc"] = "desc",
+    ) -> QueryResponse:
+        del query, limit, populate_rocket, populate_launchpad, sort_direction
+        return {"docs": [], "totalDocs": 0}
+
+    async def query_rockets_raw(
+        self,
+        *,
+        query: Mapping[str, object],
+        limit: int = 10,
+    ) -> QueryResponse:
+        del query, limit
+        return {"docs": [], "totalDocs": 0}
 
     async def close(self) -> None:
         return None

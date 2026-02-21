@@ -12,6 +12,9 @@ from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
 
 from core.exceptions import SpaceXApiError
+from core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def build_trim_messages_middleware(
@@ -56,9 +59,17 @@ async def handle_spacex_tool_errors(
         return await handler(request)
     except SpaceXApiError as exc:
         tool_call_id = ""
+        tool_name = ""
         tool_call = getattr(request, "tool_call", None)
         if isinstance(tool_call, Mapping):
             tool_call_id = str(tool_call.get("id", ""))
+            tool_name = str(tool_call.get("name", ""))
+        logger.error(
+            "spacex_tool_call_failed",
+            tool_name=tool_name,
+            tool_call_id=tool_call_id,
+            error=str(exc),
+        )
         return ToolMessage(
             content=(
                 "SpaceX API request failed. "

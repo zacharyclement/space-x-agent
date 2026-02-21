@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "space-x-agent"
+version = "0.1.0"
+description = "Conversational SpaceX agent with FastAPI and LangChain."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0,<1.0.0",
+  "httpx>=0.27.0,<1.0.0",
+  "langchain>=0.3.0,<0.4.0",
+  "langchain-openai>=0.2.0,<0.3.0",
+  "langgraph>=0.2.0,<0.3.0",
+  "pydantic>=2.8.0,<3.0.0",
+  "pydantic-settings>=2.4.0,<3.0.0",
+  "structlog>=24.4.0,<26.0.0",
+  "uvicorn[standard]>=0.30.0,<1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "black>=24.8.0,<25.0.0",
+  "isort>=5.13.0,<6.0.0",
+  "mypy>=1.11.0,<2.0.0",
+  "pytest>=8.3.0,<9.0.0",
+  "pytest-asyncio>=0.24.0,<1.0.0",
+  "ruff>=0.6.0,<1.0.0",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "B", "UP"]
+ignore = []
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true

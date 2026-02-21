@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpaceX Agent Chat</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      #messages {
+        border: 1px solid #888;
+        border-radius: 8px;
+        min-height: 320px;
+        padding: 0.75rem;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+      }
+      .msg {
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+      }
+      .user {
+        font-weight: bold;
+      }
+      .assistant {
+        color: #0b6;
+      }
+      form {
+        display: flex;
+        gap: 0.5rem;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 0.6rem;
+      }
+      button {
+        padding: 0.6rem 1rem;
+      }
+      .small {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SpaceX Agent</h1>
+    <p class="small">Ask questions about SpaceX launches using live API-backed tools.</p>
+    <p class="small">Thread ID: <span id="thread-id"></span></p>
+
+    <div id="messages" aria-live="polite"></div>
+
+    <form id="chat-form">
+      <input id="message-input" type="text" name="message" placeholder="Ask about SpaceX..." required />
+      <button type="submit">Send</button>
+      <button type="button" id="new-thread-button">New Thread</button>
+    </form>
+
+    <script>
+      const CHAT_ENDPOINT = "/chat";
+      const THREAD_KEY = "spacex_agent_thread_id";
+      const messageContainer = document.getElementById("messages");
+      const threadIdLabel = document.getElementById("thread-id");
+      const form = document.getElementById("chat-form");
+      const input = document.getElementById("message-input");
+      const newThreadButton = document.getElementById("new-thread-button");
+
+      let threadId = localStorage.getItem(THREAD_KEY) || "";
+      renderThreadId();
+
+      function appendMessage(role, text) {
+        const row = document.createElement("div");
+        row.className = "msg";
+        const speaker = document.createElement("span");
+        speaker.className = role === "user" ? "user" : "assistant";
+        speaker.textContent = role === "user" ? "You: " : "Assistant: ";
+        const content = document.createElement("span");
+        content.textContent = text;
+        row.appendChild(speaker);
+        row.appendChild(content);
+        messageContainer.appendChild(row);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
+
+      function renderThreadId() {
+        threadIdLabel.textContent = threadId || "(new)";
+      }
+
+      async function sendMessage(message) {
+        const payload = { message, thread_id: threadId || null };
+        const response = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || "Request failed");
+        }
+        return response.json();
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage("user", message);
+        input.value = "";
+        input.focus();
+
+        try {
+          const data = await sendMessage(message);
+          if (data.thread_id && data.thread_id !== threadId) {
+            threadId = data.thread_id;
+            localStorage.setItem(THREAD_KEY, threadId);
+            renderThreadId();
+          }
+          appendMessage("assistant", data.reply || "(no response)");
+        } catch (error) {
+          appendMessage("assistant", `Error: ${String(error)}`);
+        }
+      });
+
+      newThreadButton.addEventListener("click", () => {
+        threadId = "";
+        localStorage.removeItem(THREAD_KEY);
+        renderThreadId();
+        appendMessage("assistant", "Started a new thread.");
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+---
+CODE STYLE GUIDELINES:
+
+General:
+The code is written in Python.
+Code must be easy to understand, maintain, test, deploy, and scale.
+Code must be written as simply as possible, but no simpler.
+Code must be easy for humans to read.
+Favor explicitness over magic.
+
+Design
+Prefer OOP, but use simple functions when OOP adds no clarity.
+Prefer composition over inheritance.
+Use dependency injection to implement Dependency Inversion.
+Follow DRY principles (don't repeat yourself).
+Follow SOLID principles:
+* Single Responsibility
+* Open/Closed
+* Liskov Substitution
+* Interface Segregation
+* Dependency Inversion
+Do not introduce abstractions without at least two concrete use cases.
+
+Scalability:
+Avoid global state.
+Avoid tight coupling.
+External dependencies must be abstracted behind interfaces.
+Domain logic must not depend on frameworks.
+
+Standards:
+Use PEP 8 for Python code
+Format with black.
+Lint with ruff (or flake8).
+Sort imports with isort.
+Use type hints for all function signatures.
+Use mypy (or pyright) for static type checking.
+Avoid Any unless absolutely necessary.
+Prefer explicit return types.
+Public classes and functions must have docstrings, use Google-style.
+
+Testing
+Use pytest for testing.
+No business logic inside controllers or frameworks.
+Use dependency injection to mock external systems.
+Tests must be deterministic (no random sleeps, no real network calls).
+
+Logging:
+Use structured logging (never print in production code).
+Never swallow exceptions silently.
+Raise domain-specific exceptions.
+Fail fast on invalid state.
+
+Naming
+Classes → PascalCase
+Functions → snake_case
+Constants → UPPER_CASE
+Private members → _leading_underscore
+
+Configuration
+Secrets must only be provided via environment variables.
+Secrets must never be hardcoded or committed.
+Non-secret configuration must use structured settings management.
+Use pydantic settings models for application configuration.

@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     langchain_api_key: SecretStr = Field(..., description="LangSmith API key.")
     langchain_tracing_v2: bool = True
     langchain_project: str = "space-x-agent"
-    openai_model: str = "gpt-4.1-mini"
+    openai_model: str = "gpt-5-mini"
     spacex_api_base_url: AnyHttpUrl = AnyHttpUrl("https://api.spacexdata.com/v5")
     request_timeout_seconds: PositiveFloat = 10.0
     max_history_messages: PositiveInt = 20

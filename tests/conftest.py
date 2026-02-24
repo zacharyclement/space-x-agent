@@ -16,7 +16,7 @@ def set_required_env(monkeypatch: pytest.MonkeyPatch) -> Generator[None, None, N
     monkeypatch.setenv("LANGCHAIN_API_KEY", "test-langsmith-key")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
     monkeypatch.setenv("OPENAI_MODEL", "gpt-4.1-mini")
-    monkeypatch.setenv("SPACEX_API_BASE_URL", "https://api.spacexdata.com/v5")
+    monkeypatch.setenv("SPACEX_API_BASE_URL", "https://api.spacexdata.com/v4")
     get_settings.cache_clear()
     yield
     get_settings.cache_clear()

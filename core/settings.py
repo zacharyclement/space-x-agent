@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     langchain_tracing_v2: bool = True
     langchain_project: str = "space-x-agent"
     openai_model: str = "gpt-5-mini"
-    spacex_api_base_url: AnyHttpUrl = AnyHttpUrl("https://api.spacexdata.com/v5")
+    spacex_api_base_url: AnyHttpUrl = AnyHttpUrl("https://api.spacexdata.com/v4")
     request_timeout_seconds: PositiveFloat = 10.0
     max_history_messages: PositiveInt = 20
     max_user_message_chars: PositiveInt = 2000

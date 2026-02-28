@@ -2,24 +2,17 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 import os
-from typing import Literal
 
 from fastapi.testclient import TestClient
-
-from api.dependencies import AppContainer
 
 os.environ.setdefault("OPENAI_API_KEY", "test-openai-key")
 os.environ.setdefault("LANGCHAIN_API_KEY", "test-langsmith-key")
 
-from api.main import create_app
-from core.settings import Settings
-from services.spacex_client_interface import (
-    LaunchRecord,
-    QueryResponse,
-    SpaceXClientInterface,
-)
+from api.dependencies import AppContainer  # noqa: E402
+from api.main import create_app  # noqa: E402
+from core.settings import Settings  # noqa: E402
+from services.spacex_client_interface import SpaceXClientInterface  # noqa: E402
 
 
 class FakeRunner:
@@ -32,57 +25,25 @@ class FakeRunner:
 class FakeSpaceXClient(SpaceXClientInterface):
     """No-op client for API tests."""
 
-    async def get_latest_launch(self) -> LaunchRecord:
+    async def get_latest_launch(self) -> dict:
         return {}
 
-    async def get_next_launch(self) -> LaunchRecord:
+    async def get_next_launch(self) -> dict:
         return {}
 
-    async def get_launches(
+    async def query_launches(
         self,
+        query: dict,
         *,
-        year: int | None = None,
-        successful: bool | None = None,
-        limit: int = 100,
-    ) -> Sequence[LaunchRecord]:
-        del year, successful, limit
-        return []
-
-    async def search_launches(self, query: str, *, limit: int = 10) -> Sequence[LaunchRecord]:
-        del query, limit
-        return []
-
-    async def get_rocket(self, rocket_id: str) -> LaunchRecord:
-        del rocket_id
-        return {}
-
-    async def get_successful_launches_by_rocket(
-        self, rocket_name: str, *, limit: int = 10
-    ) -> Sequence[LaunchRecord]:
-        del rocket_name, limit
-        return []
-
-    async def query_launches_raw(
-        self,
-        *,
-        query: Mapping[str, object],
-        limit: int = 1000,
-        populate_rocket: bool = True,
-        populate_launchpad: bool = False,
-        sort_direction: Literal["asc", "desc"] = "desc",
-        select_fields: str | None = None,
-    ) -> QueryResponse:
-        del query, limit, populate_rocket, populate_launchpad, sort_direction, select_fields
+        options: dict | None = None,
+    ) -> dict:
         return {"docs": [], "totalDocs": 0}
 
-    async def query_rockets_raw(
-        self,
-        *,
-        query: Mapping[str, object],
-        limit: int = 1000,
-    ) -> QueryResponse:
-        del query, limit
-        return {"docs": [], "totalDocs": 0}
+    async def get_rockets(self) -> list[dict]:
+        return []
+
+    async def get_launchpads(self) -> list[dict]:
+        return []
 
     async def close(self) -> None:
         return None
@@ -94,7 +55,7 @@ def _build_test_container() -> AppContainer:
         langchain_api_key="test-langsmith-key",
         langchain_tracing_v2=False,
         openai_model="gpt-4.1-mini",
-        spacex_api_base_url="https://api.spacexdata.com/v5",
+        spacex_api_base_url="https://api.spacexdata.com/v4",
         max_user_message_chars=30,
     )
     return AppContainer(

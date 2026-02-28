@@ -3,69 +3,59 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
-from typing import Literal
-
-LaunchRecord = Mapping[str, object]
-QueryResponse = Mapping[str, object]
 
 
 class SpaceXClientInterface(ABC):
-    """Interface for querying SpaceX launch and rocket data."""
+    """Interface for querying SpaceX data from the public REST API."""
 
     @abstractmethod
-    async def get_latest_launch(self) -> LaunchRecord:
-        """Fetch the latest launch."""
+    async def get_latest_launch(self) -> dict:
+        """Fetch the most recent past launch.
+
+        Returns:
+            Raw JSON response from GET /launches/latest.
+        """
 
     @abstractmethod
-    async def get_next_launch(self) -> LaunchRecord:
-        """Fetch the next scheduled launch."""
+    async def get_next_launch(self) -> dict:
+        """Fetch the next scheduled upcoming launch.
+
+        Returns:
+            Raw JSON response from GET /launches/next.
+        """
 
     @abstractmethod
-    async def get_launches(
+    async def query_launches(
         self,
+        query: dict,
         *,
-        year: int | None = None,
-        successful: bool | None = None,
-        limit: int = 100,
-    ) -> Sequence[LaunchRecord]:
-        """Fetch launches with optional filters."""
+        options: dict | None = None,
+    ) -> dict:
+        """Query launches via the SpaceX /launches/query endpoint.
+
+        Args:
+            query: MongoDB-style filter document.
+            options: Pagination/sort/populate options (limit, sort, populate, etc.).
+
+        Returns:
+            Raw JSON response from POST /launches/query containing ``docs`` and ``totalDocs``.
+        """
 
     @abstractmethod
-    async def search_launches(self, query: str, *, limit: int = 10) -> Sequence[LaunchRecord]:
-        """Search launches by mission name."""
+    async def get_rockets(self) -> list[dict]:
+        """Fetch all rockets.
+
+        Returns:
+            Raw JSON list from GET /rockets.
+        """
 
     @abstractmethod
-    async def get_rocket(self, rocket_id: str) -> LaunchRecord:
-        """Fetch a rocket by ID."""
+    async def get_launchpads(self) -> list[dict]:
+        """Fetch all launchpads.
 
-    @abstractmethod
-    async def get_successful_launches_by_rocket(
-        self, rocket_name: str, *, limit: int = 10
-    ) -> Sequence[LaunchRecord]:
-        """Fetch successful launches for a given rocket name."""
-
-    @abstractmethod
-    async def query_launches_raw(
-        self,
-        *,
-        query: Mapping[str, object],
-        limit: int = 1000,
-        populate_rocket: bool = True,
-        populate_launchpad: bool = False,
-        sort_direction: Literal["asc", "desc"] = "desc",
-        select_fields: str | None = None,
-    ) -> QueryResponse:
-        """Return raw `/launches/query` response payload."""
-
-    @abstractmethod
-    async def query_rockets_raw(
-        self,
-        *,
-        query: Mapping[str, object],
-        limit: int = 1000,
-    ) -> QueryResponse:
-        """Return broad raw rocket payload."""
+        Returns:
+            Raw JSON list from GET /launchpads.
+        """
 
     @abstractmethod
     async def close(self) -> None:
